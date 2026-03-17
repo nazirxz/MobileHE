@@ -255,30 +255,45 @@ export default function PatientSession() {
     ),
     1: (
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#F7E8EE" }}>
-            <BookOpen className="w-5 h-5" style={{ color: "#C96B8A" }} />
-          </div>
-          <div>
-            <h3 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E" }}>{sessionDef.edukasi.title}</h3>
-            <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.75rem", color: "#C96B8A" }}>Edukasi Kesehatan</span>
-          </div>
-        </div>
-        {sessionDef.edukasi.content.map((para, i) => (
-          <div key={i} className="rounded-2xl p-4" style={{ background: i % 2 === 0 ? "white" : "#FEF9F7", border: "1px solid #F0E8EE" }}>
-            <p style={{ fontFamily: "Nunito, sans-serif", color: "#4A4A6A", lineHeight: 1.8, fontSize: "0.9rem" }}>{para}</p>
-          </div>
-        ))}
-        <div className="rounded-2xl p-4" style={{ background: "#F7E8EE" }}>
-          <h4 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#C96B8A", marginBottom: "0.5rem" }}>💡 Poin Penting:</h4>
-          {sessionDef.edukasi.keyPoints.map((point, i) => (
-            <div key={i} className="flex items-start gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#C96B8A" }} />
-              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.85rem", color: "#6B4A5A" }}>{point}</span>
+        {dayNum === 1 ? (
+          <>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#F7E8EE" }}>
+                <BookOpen className="w-5 h-5" style={{ color: "#C96B8A" }} />
+              </div>
+              <div>
+                <h3 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E" }}>{sessionDef.edukasi.title}</h3>
+                <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.75rem", color: "#C96B8A" }}>Edukasi Kesehatan</span>
+              </div>
             </div>
-          ))}
-        </div>
-        <button onClick={() => setStep(2)} className="w-full py-4 rounded-2xl text-white" style={{ background: "linear-gradient(135deg, #E8789A, #C96B8A)", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
+            {sessionDef.edukasi.content.map((para, i) => (
+              <div key={i} className="rounded-2xl p-4" style={{ background: i % 2 === 0 ? "white" : "#FEF9F7", border: "1px solid #F0E8EE" }}>
+                <p style={{ fontFamily: "Nunito, sans-serif", color: "#4A4A6A", lineHeight: 1.8, fontSize: "0.9rem" }}>{para}</p>
+              </div>
+            ))}
+            <div className="rounded-2xl p-4" style={{ background: "#F7E8EE" }}>
+              <h4 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#C96B8A", marginBottom: "0.5rem" }}>💡 Poin Penting:</h4>
+              {sessionDef.edukasi.keyPoints.map((point, i) => (
+                <div key={i} className="flex items-start gap-2 mb-2">
+                  <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#C96B8A" }} />
+                  <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.85rem", color: "#6B4A5A" }}>{point}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="rounded-2xl p-4" style={{ background: "#FEF9F7", border: "1px solid #F0E8EE" }}>
+            <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", lineHeight: 1.7, fontSize: "0.9rem" }}>
+              Untuk hari ke-{dayNum}, belum ada materi edukasi tertulis khusus. Kamu bisa langsung melanjutkan ke modul{" "}
+              <strong style={{ color: "#C96B8A" }}>Musik Terapi</strong> untuk mendapatkan dukungan relaksasi hari ini.
+            </p>
+          </div>
+        )}
+        <button
+          onClick={() => setStep(2)}
+          className="w-full py-4 rounded-2xl text-white"
+          style={{ background: "linear-gradient(135deg, #E8789A, #C96B8A)", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}
+        >
           Lanjut ke Musik Terapi →
         </button>
       </div>
