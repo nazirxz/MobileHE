@@ -39,6 +39,11 @@ export interface SessionRecord {
   refleksiAnswers?: { [key: string]: string };
   afirmasiNote?: string;
   modulesCompleted?: string[];
+  /**
+   * URL rekaman suara afirmasi pasien (mock).
+   * Pada implementasi ini digunakan untuk memungkinkan perawat memutar kembali suara afirmasi.
+   */
+  affirmationAudioUrl?: string;
 }
 
 export interface Patient {
@@ -695,7 +700,20 @@ export const patients: Patient[] = [
     password: "siti123",
     phone: "0812-3456-7890",
     sessions: [
-      { day: 1, status: "selesai", completedAt: "2026-02-10T09:30:00", durationMinutes: 32, mood: 3, refleksiAnswers: { q1: "Hari ini cukup berat, tapi saya merasa ada harapan setelah membaca program ini.", q2: "Saya bersyukur masih bisa bangun pagi dan melihat anak-anak saya." }, afirmasiNote: "Saya mengucapkan afirmasi dengan suara pelan namun terasa menyentuh." }, 
+      {
+        day: 1,
+        status: "selesai",
+        completedAt: "2026-02-10T09:30:00",
+        durationMinutes: 32,
+        mood: 3,
+        refleksiAnswers: {
+          q1: "Hari ini cukup berat, tapi saya merasa ada harapan setelah membaca program ini.",
+          q2: "Saya bersyukur masih bisa bangun pagi dan melihat anak-anak saya.",
+        },
+        afirmasiNote: "Saya mengucapkan afirmasi dengan suara pelan namun terasa menyentuh.",
+        // Contoh rekaman afirmasi yang dapat diputar perawat
+        affirmationAudioUrl: "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav",
+      }, 
       { day: 2, status: "selesai", completedAt: "2026-02-11T10:15:00", durationMinutes: 28, mood: 3, refleksiAnswers: { q1: "Melihat cermin masih terasa berat. Tapi saya coba menerimanya.", q2: "Terima kasih tubuhku sudah berjuang dengan begitu keras." }, afirmasiNote: "Awalnya sulit, tapi semakin diulang semakin terasa nyaman." },
       { day: 3, status: "selesai", completedAt: "2026-02-12T08:45:00", durationMinutes: 35, mood: 2, refleksiAnswers: { q1: "Mual sangat parah hari ini. Tapi minum jahe sedikit membantu.", q2: "Tidur sebentar dan memandang foto keluarga membantu saya." }, afirmasiNote: "Saya mengulangi afirmasi saat mual datang dan rasanya sedikit membantu." },
       { day: 4, status: "selesai", completedAt: "2026-02-13T09:00:00", durationMinutes: 30, mood: 4, refleksiAnswers: { q1: "Latihan pernapasan terasa sangat menenangkan. Saya merasa lebih ringan.", q2: "Saat cemas malam tadi, saya coba teknik 4-7-8 dan berhasil tidur." }, afirmasiNote: "" },

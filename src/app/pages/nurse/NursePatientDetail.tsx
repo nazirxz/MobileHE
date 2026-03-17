@@ -102,6 +102,21 @@ function ApprovalCard({
                   <p style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.78rem", color: "#3A6A4A", fontStyle: "italic" }}>{session.afirmasiNote}</p>
                 </div>
               )}
+              {/* Afirmasi audio */}
+              {session.affirmationAudioUrl && (
+                <div className="rounded-xl p-3" style={{ background: "#DDF5F0" }}>
+                  <p className="mb-2" style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D6A4A", fontSize: "0.78rem" }}>
+                    🎧 Rekaman Suara Afirmasi Pasien:
+                  </p>
+                  <audio
+                    controls
+                    src={session.affirmationAudioUrl}
+                    className="w-full"
+                  >
+                    Browser Anda tidak mendukung pemutar audio.
+                  </audio>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -408,7 +423,16 @@ export default function NursePatientDetail() {
                     <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.7rem", color: "#9B9BAE" }}>{s.completedAt ? new Date(s.completedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
                   </div>
                   <p className="mb-1" style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.78rem", color: "#4A8F6A", fontStyle: "italic" }}>"{def?.afirmasi.mainText}"</p>
-                  <p style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.82rem", color: "#4A4A6A", lineHeight: 1.6 }}>{s.afirmasiNote}</p>
+                  <p className="mb-2" style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.82rem", color: "#4A4A6A", lineHeight: 1.6 }}>{s.afirmasiNote}</p>
+                  {s.affirmationAudioUrl && (
+                    <audio
+                      controls
+                      src={s.affirmationAudioUrl}
+                      className="w-full mt-1"
+                    >
+                      Browser Anda tidak mendukung pemutar audio.
+                    </audio>
+                  )}
                 </div>
               );
             })}

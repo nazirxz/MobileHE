@@ -109,7 +109,12 @@ function MusicPlayer({ duration, title, musicType }: { duration: number; title: 
   );
 }
 
-function RecordingSimulator({ text, onSave }: { text: string; onSave: (note: string) => void }) {
+interface RecordingSimulatorProps {
+  text: string;
+  onSave: (payload: { note: string; audioUrl?: string }) => void;
+}
+
+function RecordingSimulator({ text, onSave }: RecordingSimulatorProps) {
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -168,7 +173,17 @@ function RecordingSimulator({ text, onSave }: { text: string; onSave: (note: str
           style={{ background: "#FEF9F7", border: "2px solid #D8E8D0", fontFamily: "Nunito, sans-serif", color: "#2D2D3E" }}
         />
       </div>
-      <button onClick={() => onSave(written || (recorded ? "Rekaman selesai" : ""))} className="w-full py-3 rounded-xl text-white" style={{ background: "linear-gradient(135deg, #90D0A8, #6BAF8F)", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
+      <button
+        onClick={() =>
+          onSave({
+            note: written || (recorded ? "Rekaman suara afirmasi telah direkam." : ""),
+            // Untuk prototipe, gunakan satu contoh URL audio yang sama.
+            audioUrl: recorded ? "https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav" : undefined,
+          })
+        }
+        className="w-full py-3 rounded-xl text-white"
+        style={{ background: "linear-gradient(135deg, #90D0A8, #6BAF8F)", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}
+      >
         Simpan Afirmasi →
       </button>
     </div>
@@ -186,6 +201,7 @@ export default function PatientSession() {
 
   const [step, setStep] = useState(0); // 0=intro, 1=edukasi, 2=musik, 3=afirmasi, 4=refleksi, 5=done
   const [afirmasiNote, setAfirmasiNote] = useState("");
+  const [afirmasiAudioUrl, setAfirmasiAudioUrl] = useState<string | undefined>(undefined);
   const [mood, setMood] = useState<number | null>(null);
   const [refleksiAnswers, setRefleksiAnswers] = useState<Record<string, string>>({});
   const [startTime] = useState(Date.now());
@@ -202,6 +218,7 @@ export default function PatientSession() {
       mood: mood ?? 3,
       refleksiAnswers,
       afirmasiNote,
+      affirmationAudioUrl: afirmasiAudioUrl,
       modulesCompleted: ["edukasi", "musik", "afirmasi", "refleksi"],
     });
     setStep(5);
@@ -302,7 +319,14 @@ export default function PatientSession() {
         <div className="rounded-2xl p-4" style={{ background: "#E8F5EE" }}>
           <p style={{ fontFamily: "Nunito, sans-serif", color: "#4A8F6A", fontSize: "0.85rem", lineHeight: 1.7 }}>{sessionDef.afirmasi.instructions}</p>
         </div>
-        <RecordingSimulator text={sessionDef.afirmasi.mainText} onSave={(note) => { setAfirmasiNote(note); setStep(4); }} />
+        <RecordingSimulator
+          text={sessionDef.afirmasi.mainText}
+          onSave={({ note, audioUrl }) => {
+            setAfirmasiNote(note);
+            setAfirmasiAudioUrl(audioUrl);
+            setStep(4);
+          }}
+        />
       </div>
     ),
     4: (
