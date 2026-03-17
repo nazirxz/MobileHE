@@ -200,8 +200,15 @@ export default function NursePatientDetail() {
   const avgMoodLabel = completed.length > 0 ? MOOD_LABELS[Math.round(avgMood) - 1] : "—";
 
   const moodData = completed.map((s) => ({ hari: `H${s.day}`, mood: s.mood ?? 3 }));
-  const recentReflections = completed.filter((s) => s.refleksiAnswers && Object.keys(s.refleksiAnswers).length > 0).reverse().slice(0, 3);
-  const recentAfirmasi = completed.filter((s) => s.afirmasiNote).reverse().slice(0, 3);
+  const recentReflections = completed
+    .filter((s) => s.refleksiAnswers && Object.keys(s.refleksiAnswers).length > 0)
+    .reverse()
+    .slice(0, 3);
+  const recentAfirmasi = completed
+    .filter((s) => s.afirmasiNote)
+    .reverse()
+    .slice(0, 3);
+  const voiceAffirmations = completed.filter((s) => s.affirmationAudioUrl);
 
   const handleApprove = (day: number, status: "disetujui" | "ditolak", note: string) => {
     if (id) approveSession(id, day, status, note);
@@ -363,8 +370,18 @@ export default function NursePatientDetail() {
             {[
               { label: "Edukasi", count: completed.length, icon: BookOpen, color: "#C96B8A" },
               { label: "Musik Terapi", count: completed.length, icon: Music, color: "#8B7EC4" },
-              { label: "Afirmasi (Dicatat)", count: completed.filter((s) => s.afirmasiNote).length, icon: Mic, color: "#6BAF8F" },
-              { label: "Refleksi (Diisi)", count: completed.filter((s) => s.refleksiAnswers && Object.keys(s.refleksiAnswers).length > 0).length, icon: MessageSquare, color: "#C49A40" },
+              {
+                label: "Afirmasi (Suara)",
+                count: voiceAffirmations.length,
+                icon: Mic,
+                color: "#6BAF8F",
+              },
+              {
+                label: "Refleksi (Diisi)",
+                count: completed.filter((s) => s.refleksiAnswers && Object.keys(s.refleksiAnswers).length > 0).length,
+                icon: MessageSquare,
+                color: "#C49A40",
+              },
             ].map(({ label, count, icon: Icon, color }) => (
               <div key={label} className="flex items-center gap-2 p-3 rounded-xl" style={{ background: "#FAF8FF" }}>
                 <Icon className="w-4 h-4" style={{ color }} />
@@ -376,6 +393,75 @@ export default function NursePatientDetail() {
             ))}
           </div>
         </motion.div>
+
+        {/* Voice affirmation list */}
+        {voiceAffirmations.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.13 }}
+            className="rounded-2xl overflow-hidden"
+            style={{ background: "white", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
+          >
+            <div className="px-4 py-3 flex items-center gap-2" style={{ background: "#E8F5EE" }}>
+              <Mic className="w-4 h-4" style={{ color: "#2D6A4A" }} />
+              <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E" }}>
+                Afirmasi Suara Pasien
+              </span>
+            </div>
+            {voiceAffirmations
+              .slice()
+              .reverse()
+              .map((s) => {
+                const def = sessions.find((sd) => sd.day === s.day);
+                return (
+                  <div key={s.day} className="px-4 py-4" style={{ borderBottom: "1px solid #F0FAF5" }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span
+                        className="text-xs px-2 py-1 rounded-full"
+                        style={{
+                          background: "#DDF5F0",
+                          color: "#2D6A4A",
+                          fontFamily: "Nunito, sans-serif",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Hari {s.day}: {def?.title}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: "Nunito, sans-serif",
+                          fontSize: "0.7rem",
+                          color: "#9B9BAE",
+                        }}
+                      >
+                        {s.completedAt
+                          ? new Date(s.completedAt).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                            })
+                          : ""}
+                      </span>
+                    </div>
+                    <p
+                      className="mb-2"
+                      style={{
+                        fontFamily: "Nunito, sans-serif",
+                        fontSize: "0.78rem",
+                        color: "#4A8F6A",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      "{def?.afirmasi.mainText}"
+                    </p>
+                    <audio controls src={s.affirmationAudioUrl} className="w-full">
+                      Browser Anda tidak mendukung pemutar audio.
+                    </audio>
+                  </div>
+                );
+              })}
+          </motion.div>
+        )}
 
         {/* Recent reflections */}
         {recentReflections.length > 0 && (
