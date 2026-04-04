@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Navigate } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft, BookOpen, Music, Mic, PenLine,
@@ -193,7 +193,7 @@ function RecordingSimulator({ text, onSave }: RecordingSimulatorProps) {
 export default function PatientSession() {
   const { hari } = useParams<{ hari: string }>();
   const navigate = useNavigate();
-  const { currentUser, completeSession } = useApp();
+  const { currentUser, completeSession, getQuestionnaireBundle } = useApp();
   const patient = currentUser as Patient;
 
   const dayNum = parseInt(hari ?? "1", 10);
@@ -223,6 +223,12 @@ export default function PatientSession() {
   }, [dayNum]);
 
   if (!sessionDef) return <div className="p-8 text-center" style={{ fontFamily: "Nunito, sans-serif" }}>Sesi tidak ditemukan.</div>;
+
+  if (!patient?.id) return <Navigate to="/" replace />;
+
+  if (!getQuestionnaireBundle(patient.id).pre) {
+    return <Navigate to="/pasien" replace />;
+  }
 
   const hasEdukasiStep = dayNum === 1;
   const activeModules = hasEdukasiStep ? [...MODULES_ALL] : MODULES_ALL.slice(1);

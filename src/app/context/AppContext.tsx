@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { patients, nurses, Patient, Nurse, SessionRecord } from "../data/mockData";
+import {
+  DEMO_POST_TEST_PATIENT_ID,
+  getDemoPostTestPreSeed,
+  type PatientQuestionnaireBundle,
+  type QuestionnaireSubmission,
+} from "../data/researchQuestionnaire";
 
 export type UserRole = "pasien" | "perawat";
 
@@ -20,6 +26,8 @@ interface AppContextType {
   getPendingApprovals: () => PendingApproval[];
   getAllPatients: () => Patient[];
   getPatientById: (id: string) => Patient | undefined;
+  getQuestionnaireBundle: (patientId: string) => PatientQuestionnaireBundle;
+  saveQuestionnaireSubmission: (patientId: string, submission: QuestionnaireSubmission) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -27,12 +35,14 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const STORAGE_KEY = "snefi_care_auth";
 const SESSIONS_KEY = "snefi_care_sessions";
 const DAYS_KEY = "snefi_care_days";
+const QUESTIONNAIRE_KEY = "snefi_care_questionnaires";
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<Patient | Nurse | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [sessionOverrides, setSessionOverrides] = useState<Record<string, SessionRecord[]>>({});
   const [patientDayOverrides, setPatientDayOverrides] = useState<Record<string, number>>({});
+  const [questionnaireOverrides, setQuestionnaireOverrides] = useState<Record<string, PatientQuestionnaireBundle>>({});
 
   useEffect(() => {
     try {
@@ -51,6 +61,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (savedSessions) setSessionOverrides(JSON.parse(savedSessions));
       const savedDays = localStorage.getItem(DAYS_KEY);
       if (savedDays) setPatientDayOverrides(JSON.parse(savedDays));
+      const savedQ = localStorage.getItem(QUESTIONNAIRE_KEY);
+      let qInit: Record<string, PatientQuestionnaireBundle> = savedQ ? JSON.parse(savedQ) : {};
+      /* Pre-test seed untuk akun demo post-test: program sudah 15 hari, post bisa langsung diuji */
+      if (!qInit[DEMO_POST_TEST_PATIENT_ID]?.pre) {
+        qInit = {
+          ...qInit,
+          [DEMO_POST_TEST_PATIENT_ID]: {
+            ...qInit[DEMO_POST_TEST_PATIENT_ID],
+            pre: getDemoPostTestPreSeed(),
+          },
+        };
+        localStorage.setItem(QUESTIONNAIRE_KEY, JSON.stringify(qInit));
+      }
+      setQuestionnaireOverrides(qInit);
     } catch {}
   }, []);
 
@@ -189,12 +213,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const getPatientById = useCallback((id: string) => patients.find((p) => p.id === id), []);
 
+  const getQuestionnaireBundle = useCallback(
+    (patientId: string) => questionnaireOverrides[patientId] ?? {},
+    [questionnaireOverrides]
+  );
+
+  const saveQuestionnaireSubmission = useCallback((patientId: string, submission: QuestionnaireSubmission) => {
+    setQuestionnaireOverrides((prev) => {
+      const cur = prev[patientId] ?? {};
+      const nextBundle: PatientQuestionnaireBundle = {
+        ...cur,
+        [submission.phase]: submission,
+      };
+      const next = { ...prev, [patientId]: nextBundle };
+      localStorage.setItem(QUESTIONNAIRE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   return (
     <AppContext.Provider value={{
       currentUser, userRole, login, logout,
       getPatientSessions, completeSession, approveSession,
       getEffectiveCurrentDay, getPendingApprovals,
       getAllPatients, getPatientById,
+      getQuestionnaireBundle, saveQuestionnaireSubmission,
     }}>
       {children}
     </AppContext.Provider>

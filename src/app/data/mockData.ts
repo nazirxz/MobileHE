@@ -71,6 +71,23 @@ export interface Nurse {
   password: string;
 }
 
+/** 15 sesi selesai + disetujui untuk akun demo post-test */
+function demoPostTestSessions(): SessionRecord[] {
+  return Array.from({ length: 15 }, (_, i) => {
+    const day = i + 1;
+    return {
+      day,
+      status: "selesai" as const,
+      completedAt: `2026-03-${String(day).padStart(2, "0")}T10:00:00.000Z`,
+      durationMinutes: 28,
+      mood: 3,
+      approvalStatus: "disetujui" as const,
+      refleksiAnswers: { q1: "(akun demo post-test)", q2: "(akun demo post-test)" },
+      afirmasiNote: "",
+    };
+  });
+}
+
 export const sessions: SessionDefinition[] = [
   {
     day: 1,
@@ -730,6 +747,32 @@ export const sessions: SessionDefinition[] = [
 ];
 
 export const patients: Patient[] = [
+  {
+    id: "p000",
+    name: "Demo Pasien",
+    age: 45,
+    diagnosis: "Kanker Payudara (akun uji coba)",
+    chemoCycle: "Siklus 1 dari 6",
+    startDate: "2026-04-01",
+    currentDay: 1,
+    username: "demo.pasien",
+    password: "demo123",
+    phone: "0800-0000-0000",
+    sessions: [],
+  },
+  {
+    id: "p099",
+    name: "Demo Post-test",
+    age: 45,
+    diagnosis: "Kanker Payudara (akun uji post-test)",
+    chemoCycle: "Siklus 6 dari 6",
+    startDate: "2026-02-15",
+    currentDay: 15,
+    username: "demo.post",
+    password: "post123",
+    phone: "0800-0000-0099",
+    sessions: demoPostTestSessions(),
+  },
   {
     id: "p001",
     name: "Siti Rahayu",

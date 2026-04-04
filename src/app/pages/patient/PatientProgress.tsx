@@ -1,16 +1,17 @@
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
-import { CheckCircle, Circle, Lock, TrendingUp, Clock, Star, Calendar } from "lucide-react";
+import { CheckCircle, Circle, Lock, TrendingUp, Clock, Star, Calendar, ClipboardList } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useApp } from "../../context/AppContext";
 import { sessions } from "../../data/mockData";
 import type { Patient } from "../../data/mockData";
+import { isProgramInterventionComplete } from "../../data/researchQuestionnaire";
 
 const MOODS = ["😢", "😟", "😐", "🙂", "😊"];
 
 export default function PatientProgress() {
   const navigate = useNavigate();
-  const { currentUser, getPatientSessions, getEffectiveCurrentDay } = useApp();
+  const { currentUser, getPatientSessions, getEffectiveCurrentDay, getQuestionnaireBundle } = useApp();
   const patient = currentUser as Patient;
   const allSessions = getPatientSessions(patient?.id ?? "");
   const todayDay = getEffectiveCurrentDay(patient?.id ?? "");
@@ -26,6 +27,10 @@ export default function PatientProgress() {
     label: MOODS[(s.mood ?? 3) - 1],
   }));
 
+  const qBundle = getQuestionnaireBundle(patient?.id ?? "");
+  const needsPostTest =
+    isProgramInterventionComplete(allSessions) && Boolean(qBundle.pre) && !qBundle.post;
+
   return (
     <div className="flex flex-col" style={{ background: "#FEF9F7", minHeight: "100%" }}>
       {/* Header */}
@@ -35,6 +40,25 @@ export default function PatientProgress() {
       </div>
 
       <div className="px-5 py-5 flex flex-col gap-5">
+        {needsPostTest && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl p-4 flex flex-col gap-3" style={{ background: "#E8F5EE", border: "1.5px solid #B0DDB8" }}>
+            <div className="flex items-start gap-3">
+              <ClipboardList className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#4A8F6A" }} />
+              <p style={{ fontFamily: "Nunito, sans-serif", color: "#2A5A3A", fontSize: "0.82rem", lineHeight: 1.55 }}>
+                Program 15 hari telah selesai. Jangan lupa mengisi <strong>kuesioner pasca</strong> di Beranda.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/pasien/kuesioner/post")}
+              className="w-full py-2.5 rounded-xl text-white"
+              style={{ background: "linear-gradient(135deg, #90D0A8, #6BAF8F)", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: "0.85rem" }}
+            >
+              Buka kuesioner pasca →
+            </button>
+          </motion.div>
+        )}
+
         {/* Stats cards */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 gap-3">
           {[

@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
-import { Heart, BookOpen, Music, Mic, PenLine, ChevronRight, CheckCircle, Lock, Star, Clock, AlertCircle, Headphones } from "lucide-react";
+import { Heart, BookOpen, Music, Mic, PenLine, ChevronRight, CheckCircle, Lock, Star, Clock, AlertCircle, Headphones, ClipboardList } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { sessions } from "../../data/mockData";
 import type { Patient } from "../../data/mockData";
 import { PROGRAM_CONTACT } from "../../data/programContact";
+import { isProgramInterventionComplete } from "../../data/researchQuestionnaire";
 
 const greetings = ["Selamat pagi", "Selamat siang", "Selamat sore", "Selamat malam"];
 function getGreeting() {
@@ -31,7 +32,7 @@ const moduleIcons = [
 ];
 
 export default function PatientDashboard() {
-  const { currentUser, getPatientSessions, getEffectiveCurrentDay } = useApp();
+  const { currentUser, getPatientSessions, getEffectiveCurrentDay, getQuestionnaireBundle } = useApp();
   const navigate = useNavigate();
   const patient = currentUser as Patient;
   const allSessions = getPatientSessions(patient?.id ?? "");
@@ -48,6 +49,13 @@ export default function PatientDashboard() {
   const todayApproval = todayRecord?.approvalStatus; // 'menunggu' | 'disetujui' | 'ditolak' | undefined
 
   const recentCompleted = allSessions.filter((s) => s.status === "selesai" && s.approvalStatus === "disetujui").slice(-3).reverse();
+
+  const qBundle = getQuestionnaireBundle(patient?.id ?? "");
+  const preTestDone = Boolean(qBundle.pre);
+  const postTestDone = Boolean(qBundle.post);
+  const programComplete = isProgramInterventionComplete(allSessions);
+  const needsPreTest = !preTestDone;
+  const needsPostTest = programComplete && preTestDone && !postTestDone;
 
   // Determine dot state per day
   function getDotState(d: number) {
@@ -83,6 +91,50 @@ export default function PatientDashboard() {
       </div>
 
       <div className="px-5 flex flex-col gap-5 py-5">
+        {needsPreTest && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl p-4 flex flex-col gap-3" style={{ background: "#FFF8E8", border: "1.5px solid #F0D090" }}>
+            <div className="flex items-start gap-3">
+              <ClipboardList className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#C49A40" }} />
+              <div>
+                <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#8A6A20", fontSize: "0.88rem" }}>Kuesioner pra wajib diisi</p>
+                <p style={{ fontFamily: "Nunito, sans-serif", color: "#B09040", fontSize: "0.78rem", marginTop: "0.25rem", lineHeight: 1.5 }}>
+                  Sebelum memulai sesi hari pertama, lengkapi kuesioner penelitian (SMSES-BC) terlebih dahulu.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/pasien/kuesioner/pre")}
+              className="w-full py-3 rounded-xl text-white"
+              style={{ background: "linear-gradient(135deg, #D0B060, #C49A40)", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}
+            >
+              Isi kuesioner pra →
+            </button>
+          </motion.div>
+        )}
+
+        {needsPostTest && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl p-4 flex flex-col gap-3" style={{ background: "#E8F5EE", border: "1.5px solid #B0DDB8" }}>
+            <div className="flex items-start gap-3">
+              <ClipboardList className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#4A8F6A" }} />
+              <div>
+                <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2A5A3A", fontSize: "0.88rem" }}>Kuesioner pasca program</p>
+                <p style={{ fontFamily: "Nunito, sans-serif", color: "#3A7A5A", fontSize: "0.78rem", marginTop: "0.25rem", lineHeight: 1.5 }}>
+                  Selamat, kamu telah menyelesaikan 15 hari. Mohon isi kuesioner pasca (post-test) yang sama seperti di awal.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/pasien/kuesioner/post")}
+              className="w-full py-3 rounded-xl text-white"
+              style={{ background: "linear-gradient(135deg, #90D0A8, #6BAF8F)", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}
+            >
+              Isi kuesioner pasca →
+            </button>
+          </motion.div>
+        )}
+
         {/* Progress strip */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
           <div className="rounded-2xl p-4" style={{ background: "white", boxShadow: "0 2px 12px rgba(201,107,138,0.1)" }}>
@@ -220,8 +272,12 @@ export default function PatientDashboard() {
                 )}
                 {/* State: not yet completed */}
                 {!isTodayCompleted && (
-                  <button onClick={() => navigate(`/pasien/sesi/${todayDay}`)} className="w-full py-3 rounded-xl text-white transition-transform active:scale-95" style={{ background: `linear-gradient(135deg, ${todaySessionDef.colorFrom}, ${todaySessionDef.colorTo})`, fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
-                    Mulai Sesi Hari Ini →
+                  <button
+                    onClick={() => navigate(needsPreTest ? "/pasien/kuesioner/pre" : `/pasien/sesi/${todayDay}`)}
+                    className="w-full py-3 rounded-xl text-white transition-transform active:scale-95"
+                    style={{ background: `linear-gradient(135deg, ${todaySessionDef.colorFrom}, ${todaySessionDef.colorTo})`, fontFamily: "Nunito, sans-serif", fontWeight: 700 }}
+                  >
+                    {needsPreTest ? "Isi kuesioner pra dulu →" : "Mulai Sesi Hari Ini →"}
                   </button>
                 )}
               </div>

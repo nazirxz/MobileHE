@@ -1,16 +1,20 @@
 import { motion } from "motion/react";
-import { User, Phone, Activity, Calendar, LogOut, Heart, Shield, Info, Headphones } from "lucide-react";
+import { User, Phone, Activity, Calendar, LogOut, Heart, Shield, Info, Headphones, ClipboardList } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useNavigate } from "react-router";
 import type { Patient } from "../../data/mockData";
 import { PROGRAM_CONTACT } from "../../data/programContact";
+import { isProgramInterventionComplete } from "../../data/researchQuestionnaire";
 
 export default function PatientProfile() {
-  const { currentUser, logout, getPatientSessions } = useApp();
+  const { currentUser, logout, getPatientSessions, getQuestionnaireBundle } = useApp();
   const navigate = useNavigate();
   const patient = currentUser as Patient;
   const sessions = getPatientSessions(patient?.id ?? "");
   const completed = sessions.filter((s) => s.status === "selesai");
+  const qBundle = getQuestionnaireBundle(patient?.id ?? "");
+  const programDone = isProgramInterventionComplete(sessions);
+  const canPostTest = programDone && Boolean(qBundle.pre) && !qBundle.post;
 
   const handleLogout = () => { logout(); navigate("/"); };
 
@@ -65,6 +69,27 @@ export default function PatientProfile() {
               </div>
             </div>
           ))}
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.025 }} className="rounded-2xl p-4" style={{ background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: "1px solid #F0E8EE" }}>
+          <div className="flex items-center gap-2 mb-2">
+            <ClipboardList className="w-4 h-4" style={{ color: "#8B7EC4" }} />
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E", fontSize: "0.9rem" }}>Kuesioner penelitian</span>
+          </div>
+          <div className="flex flex-col gap-2" style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.82rem", color: "#6B6B80" }}>
+            <p>Pra (pre-test): {qBundle.pre ? <span style={{ color: "#6BAF8F", fontWeight: 700 }}>Selesai</span> : <span style={{ color: "#C49A40", fontWeight: 600 }}>Belum</span>}</p>
+            <p>Pasca (post-test): {qBundle.post ? <span style={{ color: "#6BAF8F", fontWeight: 700 }}>Selesai</span> : <span style={{ color: "#C49A40", fontWeight: 600 }}>Belum</span>}</p>
+            {canPostTest && (
+              <button
+                type="button"
+                onClick={() => navigate("/pasien/kuesioner/post")}
+                className="mt-1 w-full py-2.5 rounded-xl text-white"
+                style={{ background: "linear-gradient(135deg, #90D0A8, #6BAF8F)", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: "0.82rem" }}
+              >
+                Isi kuesioner pasca →
+              </button>
+            )}
+          </div>
         </motion.div>
 
         {/* Program contact */}

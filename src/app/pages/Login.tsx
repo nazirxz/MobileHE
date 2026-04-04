@@ -30,8 +30,17 @@ export default function Login() {
   };
 
   const demoAccounts = selectedRole === "pasien"
-    ? [{ label: "Siti Rahayu", username: "siti.rahayu", password: "siti123" }, { label: "Nur Indah", username: "nur.indah", password: "nur123" }, { label: "Dewi Lestari", username: "dewi.lestari", password: "dewi123" }]
-    : [{ label: "Ns. Kartini", username: "ns.kartini", password: "kartini123" }, { label: "Ns. Budi", username: "ns.budi", password: "budi123" }];
+    ? [
+        { label: "Demo Pre — hari 1, isi pre-test & program", username: "demo.pasien", password: "demo123" },
+        { label: "Demo Post — 15 hari selesai, isi post-test", username: "demo.post", password: "post123" },
+        { label: "Siti Rahayu", username: "siti.rahayu", password: "siti123" },
+        { label: "Nur Indah", username: "nur.indah", password: "nur123" },
+        { label: "Dewi Lestari", username: "dewi.lestari", password: "dewi123" },
+      ]
+    : [
+        { label: "Ns. Kartini", username: "ns.kartini", password: "kartini123" },
+        { label: "Ns. Budi", username: "ns.budi", password: "budi123" },
+      ];
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(160deg, #FDE8F0 0%, #EEE4F8 40%, #E4EFF8 100%)" }}>

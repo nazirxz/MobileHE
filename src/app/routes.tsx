@@ -5,6 +5,7 @@ import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientSession from "./pages/patient/PatientSession";
 import PatientProgress from "./pages/patient/PatientProgress";
 import PatientProfile from "./pages/patient/PatientProfile";
+import PatientResearchQuestionnaire from "./pages/patient/PatientResearchQuestionnaire";
 import NurseLayout from "./pages/nurse/NurseLayout";
 import NurseDashboard from "./pages/nurse/NurseDashboard";
 import NursePatientDetail from "./pages/nurse/NursePatientDetail";
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
       { path: "sesi/:hari", Component: PatientSession },
       { path: "kemajuan", Component: PatientProgress },
       { path: "profil", Component: PatientProfile },
+      { path: "kuesioner/:fase", Component: PatientResearchQuestionnaire },
     ],
   },
   {

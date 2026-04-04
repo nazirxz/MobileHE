@@ -19,14 +19,15 @@ export default function PatientLayout() {
   ];
 
   const isSessionPage = location.pathname.includes("/pasien/sesi/");
+  const isQuestionnairePage = location.pathname.includes("/pasien/kuesioner/");
 
   return (
     <div className="min-h-screen flex justify-center" style={{ background: "#F5F0F8" }}>
       <div className="w-full max-w-sm flex flex-col min-h-screen relative" style={{ background: "#FEF9F7" }}>
-        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: isSessionPage ? "0" : "80px" }}>
+        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: isSessionPage || isQuestionnairePage ? "0" : "80px" }}>
           <Outlet />
         </div>
-        {!isSessionPage && (
+        {!isSessionPage && !isQuestionnairePage && (
           <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-sm z-50 border-t" style={{ background: "white", borderColor: "#F0E8EE" }}>
             <div className="flex items-center justify-around py-2">
               {tabs.map(({ path, label, icon: Icon }) => {
