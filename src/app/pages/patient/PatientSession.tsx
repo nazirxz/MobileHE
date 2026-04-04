@@ -10,12 +10,12 @@ import { sessions } from "../../data/mockData";
 import { useApp } from "../../context/AppContext";
 import type { Patient } from "../../data/mockData";
 
-const MODULES = [
+const MODULES_ALL = [
   { id: "edukasi", label: "Edukasi", icon: BookOpen, color: "#C96B8A", bg: "#F7E8EE" },
   { id: "musik", label: "Musik Terapi", icon: Music, color: "#8B7EC4", bg: "#EEE9F9" },
   { id: "afirmasi", label: "Afirmasi", icon: Mic, color: "#6BAF8F", bg: "#E8F5EE" },
   { id: "refleksi", label: "Refleksi", icon: PenLine, color: "#C49A40", bg: "#F5EDD8" },
-];
+] as const;
 
 const MOODS = [
   { value: 1, emoji: "😢", label: "Sangat Berat" },
@@ -215,12 +215,26 @@ export default function PatientSession() {
 
   useEffect(() => {
     setAffirmationPhraseIndex(0);
+    setStep(0);
+    setAfirmasiNote("");
+    setAfirmasiAudioUrl(undefined);
+    setMood(null);
+    setRefleksiAnswers({});
   }, [dayNum]);
 
   if (!sessionDef) return <div className="p-8 text-center" style={{ fontFamily: "Nunito, sans-serif" }}>Sesi tidak ditemukan.</div>;
 
+  const hasEdukasiStep = dayNum === 1;
+  const activeModules = hasEdukasiStep ? [...MODULES_ALL] : MODULES_ALL.slice(1);
+
+  /** Step angka UI: 1=edukasi (hari 1 saja), 2=musik, 3=afirmasi, 4=refleksi */
+  const stepForModuleIndex = (i: number) => (hasEdukasiStep ? i + 1 : i + 2);
+
   const handleFinishRefleksi = () => {
     const durationMinutes = Math.max(1, Math.round((Date.now() - startTime) / 60000));
+    const modulesCompleted = hasEdukasiStep
+      ? (["edukasi", "musik", "afirmasi", "refleksi"] as const)
+      : (["musik", "afirmasi", "refleksi"] as const);
     completeSession(patient.id, {
       day: dayNum,
       status: "selesai",
@@ -230,7 +244,7 @@ export default function PatientSession() {
       refleksiAnswers,
       afirmasiNote,
       affirmationAudioUrl: afirmasiAudioUrl,
-      modulesCompleted: ["edukasi", "musik", "afirmasi", "refleksi"],
+      modulesCompleted: [...modulesCompleted],
     });
     setStep(5);
   };
@@ -247,15 +261,18 @@ export default function PatientSession() {
           <p className="mt-1" style={{ fontFamily: "Nunito, sans-serif", color: "#9B9BAE" }}>{sessionDef.theme}</p>
         </div>
         <div className="w-full rounded-2xl p-4" style={{ background: "#FEF9F7", border: "1px solid #F0E8EE" }}>
-          <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", lineHeight: 1.7, fontSize: "0.9rem" }}>Selamat datang di sesi hari ini! Kamu akan melalui <strong style={{ color: "#C96B8A" }}>4 modul singkat</strong> yang dirancang untuk mendampingimu dengan penuh kasih. Lakukan dengan kecepatan dan kenyamananmu sendiri. Tidak ada yang terburu-buru. 💗</p>
+          <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", lineHeight: 1.7, fontSize: "0.9rem" }}>
+            Selamat datang di sesi hari ini! Kamu akan melalui{" "}
+            <strong style={{ color: "#C96B8A" }}>{hasEdukasiStep ? "4" : "3"} modul singkat</strong> yang dirancang untuk mendampingimu dengan penuh kasih. Lakukan dengan kecepatan dan kenyamananmu sendiri. Tidak ada yang terburu-buru. 💗
+          </p>
           {dayNum === 1 ? (
             <p className="mt-3 pt-3" style={{ fontFamily: "Nunito, sans-serif", color: "#8B5A6B", lineHeight: 1.65, fontSize: "0.82rem", borderTop: "1px solid #F0E8EE" }}>
               Pada hari pertama, selesaikan seluruh modul ini sampai tuntas; setelah perawat menyetujui sesimu, barulah kamu bisa melanjutkan ke hari berikutnya.
             </p>
           ) : null}
         </div>
-        <div className="grid grid-cols-4 gap-2 w-full">
-          {MODULES.map(({ icon: Icon, label, color, bg }) => (
+        <div className={`grid gap-2 w-full ${activeModules.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
+          {activeModules.map(({ icon: Icon, label, color, bg }) => (
             <div key={label} className="flex flex-col items-center gap-1">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: bg }}>
                 <Icon className="w-5 h-5" style={{ color }} />
@@ -264,47 +281,36 @@ export default function PatientSession() {
             </div>
           ))}
         </div>
-        <button onClick={() => setStep(1)} className="w-full py-4 rounded-2xl text-white" style={{ background: `linear-gradient(135deg, ${sessionDef.colorFrom}, ${sessionDef.colorTo})`, fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
+        <button onClick={() => setStep(hasEdukasiStep ? 1 : 2)} className="w-full py-4 rounded-2xl text-white" style={{ background: `linear-gradient(135deg, ${sessionDef.colorFrom}, ${sessionDef.colorTo})`, fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
           Mulai Sesi ✨
         </button>
       </div>
     ),
     1: (
       <div className="flex flex-col gap-4">
-        {dayNum === 1 ? (
-          <>
-            <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#F7E8EE" }}>
-                <BookOpen className="w-5 h-5" style={{ color: "#C96B8A" }} />
-              </div>
-              <div>
-                <h3 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E" }}>{sessionDef.edukasi.title}</h3>
-                <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.75rem", color: "#C96B8A" }}>Edukasi Kesehatan</span>
-              </div>
-            </div>
-            {sessionDef.edukasi.content.map((para, i) => (
-              <div key={i} className="rounded-2xl p-4" style={{ background: i % 2 === 0 ? "white" : "#FEF9F7", border: "1px solid #F0E8EE" }}>
-                <p style={{ fontFamily: "Nunito, sans-serif", color: "#4A4A6A", lineHeight: 1.8, fontSize: "0.9rem" }}>{para}</p>
-              </div>
-            ))}
-            <div className="rounded-2xl p-4" style={{ background: "#F7E8EE" }}>
-              <h4 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#C96B8A", marginBottom: "0.5rem" }}>💡 Poin Penting:</h4>
-              {sessionDef.edukasi.keyPoints.map((point, i) => (
-                <div key={i} className="flex items-start gap-2 mb-2">
-                  <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#C96B8A" }} />
-                  <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.85rem", color: "#6B4A5A" }}>{point}</span>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="rounded-2xl p-4" style={{ background: "#FEF9F7", border: "1px solid #F0E8EE" }}>
-            <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", lineHeight: 1.7, fontSize: "0.9rem" }}>
-              Untuk hari ke-{dayNum}, belum ada materi edukasi tertulis khusus. Kamu bisa langsung melanjutkan ke modul{" "}
-              <strong style={{ color: "#C96B8A" }}>Musik Terapi</strong> untuk mendapatkan dukungan relaksasi hari ini.
-            </p>
+        <div className="flex items-center gap-3 mb-1">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#F7E8EE" }}>
+            <BookOpen className="w-5 h-5" style={{ color: "#C96B8A" }} />
           </div>
-        )}
+          <div>
+            <h3 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E" }}>{sessionDef.edukasi.title}</h3>
+            <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.75rem", color: "#C96B8A" }}>Edukasi Kesehatan</span>
+          </div>
+        </div>
+        {sessionDef.edukasi.content.map((para, i) => (
+          <div key={i} className="rounded-2xl p-4" style={{ background: i % 2 === 0 ? "white" : "#FEF9F7", border: "1px solid #F0E8EE" }}>
+            <p style={{ fontFamily: "Nunito, sans-serif", color: "#4A4A6A", lineHeight: 1.8, fontSize: "0.9rem" }}>{para}</p>
+          </div>
+        ))}
+        <div className="rounded-2xl p-4" style={{ background: "#F7E8EE" }}>
+          <h4 style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#C96B8A", marginBottom: "0.5rem" }}>💡 Poin Penting:</h4>
+          {sessionDef.edukasi.keyPoints.map((point, i) => (
+            <div key={i} className="flex items-start gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "#C96B8A" }} />
+              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.85rem", color: "#6B4A5A" }}>{point}</span>
+            </div>
+          ))}
+        </div>
         <button
           onClick={() => setStep(2)}
           className="w-full py-4 rounded-2xl text-white"
@@ -490,9 +496,10 @@ export default function PatientSession() {
       {/* Step indicator */}
       {step > 0 && step < 5 && (
         <div className="px-5 py-3 flex items-center gap-2" style={{ background: "white", borderBottom: "1px solid #F0E8EE" }}>
-          {MODULES.map((m, i) => {
-            const done = i + 1 < step;
-            const current = i + 1 === step;
+          {activeModules.map((m, i) => {
+            const moduleStep = stepForModuleIndex(i);
+            const done = step > moduleStep;
+            const current = step === moduleStep;
             const Icon = m.icon;
             return (
               <div key={m.id} className="flex items-center gap-1 flex-1">
@@ -502,7 +509,7 @@ export default function PatientSession() {
                   </div>
                   <span style={{ fontFamily: "Nunito, sans-serif", fontSize: "0.55rem", color: current ? m.color : done ? m.color : "#C0B8D0", fontWeight: current ? 700 : 400 }}>{m.label}</span>
                 </div>
-                {i < 3 && <div className="h-0.5 flex-1 mx-1 rounded-full" style={{ background: done ? m.color : "#EEE8F5" }} />}
+                {i < activeModules.length - 1 && <div className="h-0.5 flex-1 mx-1 rounded-full" style={{ background: done ? m.color : "#EEE8F5" }} />}
               </div>
             );
           })}

@@ -186,6 +186,9 @@ export default function NursePatientDetail() {
   const patient = getPatientById(id ?? "") as Patient | undefined;
   const allSessions = getPatientSessions(id ?? "");
   const completed = allSessions.filter((s) => s.status === "selesai");
+  const edukasiModuleCount = completed.filter(
+    (s) => !s.modulesCompleted || s.modulesCompleted.includes("edukasi")
+  ).length;
   const pendingSessions = allSessions.filter((s) => s.approvalStatus === "menunggu");
 
   if (!patient) return (
@@ -368,7 +371,7 @@ export default function NursePatientDetail() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: "Edukasi", count: completed.length, icon: BookOpen, color: "#C96B8A" },
+              { label: "Edukasi", count: edukasiModuleCount, icon: BookOpen, color: "#C96B8A" },
               { label: "Musik Terapi", count: completed.length, icon: Music, color: "#8B7EC4" },
               {
                 label: "Afirmasi (Suara)",

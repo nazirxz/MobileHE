@@ -42,6 +42,7 @@ export default function PatientDashboard() {
 
   const todayDay = getEffectiveCurrentDay(patient?.id ?? "");
   const todaySessionDef = sessions.find((s) => s.day === todayDay);
+  const todayModuleIcons = todayDay === 1 ? moduleIcons : moduleIcons.slice(1);
   const todayRecord = allSessions.find((s) => s.day === todayDay);
   const isTodayCompleted = todayRecord?.status === "selesai";
   const todayApproval = todayRecord?.approvalStatus; // 'menunggu' | 'disetujui' | 'ditolak' | undefined
@@ -161,7 +162,7 @@ export default function PatientDashboard() {
                   )}
                 </div>
                 <div className="flex gap-2 mt-4">
-                  {moduleIcons.map(({ icon: Icon, label }) => (
+                  {todayModuleIcons.map(({ icon: Icon, label }) => (
                     <div key={label} className="flex flex-col items-center gap-1">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.25)" }}>
                         <Icon className="w-4 h-4 text-white" />
