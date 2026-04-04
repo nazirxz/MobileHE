@@ -20,6 +20,8 @@ export interface SessionDefinition {
     mainText: string;
     supportText: string;
     instructions: string;
+    /** Kalimat positive self-talk opsional; jika ada, UI menampilkan pemilih sebelum rekaman. */
+    positivePhrases?: string[];
   };
   refleksi: {
     title: string;
@@ -72,36 +74,76 @@ export interface Nurse {
 export const sessions: SessionDefinition[] = [
   {
     day: 1,
-    title: "Selamat Datang di SNEfi Care",
-    theme: "Pengenalan Program",
+    title: "Gejala Pasca Kemoterapi & Self-Efficacy",
+    theme: "Edukasi, Relaksasi, dan Positive Self-Talk",
     colorFrom: "#E8A4C8",
     colorTo: "#C96B8A",
     edukasi: {
-      title: "Mengenal Program SNEfi Care",
+      title: "Edukasi: Tanda dan Gejala Pasca Kemoterapi",
       content: [
-        "Halo, Sahabat Pejuang! Selamat datang di SNEfi Care — pendamping digitalmu dalam perjalanan pemulihan yang penuh keberanian ini.",
-        "Program ini dirancang selama 15 hari untuk membantumu merawat kesehatan pikiran dan perasaanmu, seiring proses kemoterapi yang sedang kamu jalani. Kamu tidak sendirian. Kami ada di sini, menemanimu setiap hari.",
-        "Setiap hari, kamu akan melalui empat sesi kecil yang menyenangkan: belajar tentang kesehatanmu, mendengarkan musik yang menenangkan, melatih pikiran positif, dan mencatat perasaanmu. Semua itu dirancang agar ringan dan mudah kamu lakukan, meskipun tubuhmu sedang lelah.",
-        "Yang terpenting bukan kesempurnaan, tapi kehadiran dan keberanianmu untuk mencoba setiap hari. Setiap langkah kecil yang kamu ambil adalah pencapaian yang luar biasa.",
+        "Kemoterapi adalah pengobatan kanker yang bekerja dengan membunuh sel kanker. Namun, obat ini juga dapat memengaruhi sel normal, sehingga menimbulkan berbagai gejala selama atau setelah terapi. Gejala ini berbeda pada setiap pasien.",
+        "1. Kelelahan (fatigue) — Terasa sangat lelah meskipun tidak banyak aktivitas, tidak hilang walaupun sudah istirahat, dan bisa berlangsung lama setelah kemoterapi selesai. Penyebabnya, tubuh kekurangan energi karena pengaruh obat dan kondisi penyakit.",
+        "2. Mual dan muntah — Terjadi akibat efek obat kemoterapi pada otak dan saluran cerna. Bisa muncul segera atau beberapa hari setelah terapi.",
+        "3. Gangguan konsentrasi (chemo brain) — Sulit fokus, mudah lupa, dan merasa lambat berpikir.",
+        "4. Kesemutan atau mati rasa (neuropati) — Kesemutan di tangan atau kaki, mati rasa, atau nyeri seperti terbakar.",
+        "5. Gangguan makan dan pencernaan — Nafsu makan menurun, sariawan (mukositis), diare atau sembelit.",
+        "6. Penurunan daya tahan tubuh — Mudah terkena infeksi dan bisa disertai kelelahan akibat anemia.",
+        "7. Perubahan emosi — Merasa sedih, cemas, atau depresi adalah hal yang wajar dialami.",
+        "Setelah kemoterapi, gejala seperti kelelahan, mual, gangguan saraf, dan perubahan emosi wajar terjadi dan sering muncul bersamaan. Penting mengenali gejala sejak dini agar dapat ditangani dengan baik dan kualitas hidup tetap terjaga.",
       ],
       keyPoints: [
-        "Program berlangsung selama 15 hari berturut-turut",
-        "Setiap hari ada 4 sesi singkat yang mudah dilakukan",
-        "Dilakukan dengan kecepatan dan kenyamananmu sendiri",
-        "Tidak ada jawaban yang salah dalam refleksimu",
+        "Gejala pasca kemoterapi bervariasi dan bisa muncul bersamaan",
+        "Mengenali gejala sejak dini membantu penanganan dan kualitas hidup",
+        "Segera hubungi tim kesehatan jika gejala mengganggu atau memburuk",
+        "Selesaikan seluruh sesi hari ini; setelah perawat menyetujui, kamu dapat melanjutkan ke hari berikutnya",
       ],
     },
     musik: {
-      title: "Musik Alam: Suara Hutan Hujan",
-      description: "Tutup matamu, ambil napas perlahan, dan biarkan suara alam membawamu ke tempat yang tenang dan aman. Tidak perlu melakukan apa-apa selain hadir dan bernapas.",
+      title: "Musik Relaksasi",
+      description:
+        "Musik relaksasi adalah musik yang membantu tubuh dan pikiran menjadi lebih tenang. Manfaatnya antara lain mengurangi stres dan cemas, membuat tubuh lebih rileks, membantu tidur lebih nyenyak, dan membuat pasien merasa lebih nyaman. Saat tubuh tenang, pikiran cenderung lebih jernih, perasaan lebih stabil, dan kamu bisa merasa lebih mampu menghadapi penyakit — ini mendukung self-efficacy, yaitu keyakinan bahwa kamu mampu menghadapi masalah dan menjalani pengobatan. Tutup matamu, ambil napas perlahan, dan biarkan irama menemanimu.",
       duration: 300,
-      musicType: "Suara Alam",
+      musicType: "Relaksasi",
     },
     afirmasi: {
-      title: "Afirmasi Hari Ini",
-      mainText: "Saya adalah perempuan yang kuat, berani, dan layak mendapat kebaikan.",
-      supportText: "Kamu memiliki kekuatan yang luar biasa. Percayalah pada dirimu sendiri.",
-      instructions: "Bacalah kalimat ini dengan suara pelan namun penuh keyakinan. Letakkan tangan di dadamu, rasakan detaknya, dan ulang sebanyak 3 kali.",
+      title: "Positive Self-Talk & Self-Efficacy",
+      mainText: "Saya kuat menjalani semua ini.",
+      supportText:
+        "Musik relaksasi dan positive self-talk adalah metode sederhana untuk meningkatkan self-efficacy: musik menenangkan tubuh, self-talk membangun keyakinan diri. Dengan keduanya, kamu bisa merasa lebih kuat, tenang, dan mampu menghadapi kondisi kesehatanmu.",
+      instructions:
+        "Positive self-talk berarti berbicara positif kepada diri sendiri — mengurangi rasa takut, menambah semangat, membantu berpikir positif, dan meningkatkan kepercayaan diri. Pilih salah satu kalimat di bawah, lalu bacakan dengan suara pelan namun penuh keyakinan. Letakkan tangan di dadamu bila nyaman, dan ulangi beberapa kali.",
+      positivePhrases: [
+        "Saya kuat menjalani semua ini.",
+        "Saya mampu melewati setiap tahap pengobatan.",
+        "Saya bisa menghadapi hari ini dengan baik.",
+        "Saya percaya pada kemampuan diri saya.",
+        "Saya mampu mengatasi tantangan ini.",
+        "Saya lebih kuat dari yang saya kira.",
+        "Saya tidak menyerah pada keadaan ini.",
+        "Saya terus berusaha untuk sembuh.",
+        "Tidak apa-apa jika saya lelah, saya tetap kuat.",
+        "Saya memberi waktu tubuh saya untuk beristirahat.",
+        "Tubuh saya sedang bekerja untuk pulih.",
+        "Saya mendengarkan kebutuhan tubuh saya.",
+        "Saya bisa beristirahat tanpa merasa bersalah.",
+        "Sedikit demi sedikit, saya tetap bergerak.",
+        "Saya menghargai setiap usaha kecil saya.",
+        "Saya bisa mengendalikan diri saya.",
+        "Saya bernapas perlahan dan tenang.",
+        "Tubuh saya akan kembali membaik.",
+        "Saya mampu melewati ketidaknyamanan ini.",
+        "Saya tetap berharga apa adanya.",
+        "Tubuh saya telah berjuang dengan luar biasa.",
+        "Saya menerima diri saya dengan penuh kasih.",
+        "Saya bangga dengan diri saya.",
+        "Nilai diri saya tidak berubah.",
+        "Saya menghargai tubuh saya apa adanya.",
+        "Saya tidak sendirian dalam perjalanan ini.",
+        "Saya mampu melewati masa sulit ini.",
+        "Tubuh dan pikiran saya selaras.",
+        "Setiap hari saya semakin kuat.",
+        "Saya terus melangkah maju sedikit demi sedikit.",
+      ],
     },
     refleksi: {
       title: "Refleksi Hari Ini",

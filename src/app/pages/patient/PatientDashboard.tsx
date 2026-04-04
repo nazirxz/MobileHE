@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router";
 import { motion } from "motion/react";
-import { Heart, BookOpen, Music, Mic, PenLine, ChevronRight, CheckCircle, Lock, Star, Clock, AlertCircle } from "lucide-react";
+import { Heart, BookOpen, Music, Mic, PenLine, ChevronRight, CheckCircle, Lock, Star, Clock, AlertCircle, Headphones } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { sessions } from "../../data/mockData";
 import type { Patient } from "../../data/mockData";
+import { PROGRAM_CONTACT } from "../../data/programContact";
 
 const greetings = ["Selamat pagi", "Selamat siang", "Selamat sore", "Selamat malam"];
 function getGreeting() {
@@ -271,6 +272,19 @@ export default function PatientDashboard() {
             </div>
           </motion.div>
         )}
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="rounded-2xl p-4 flex items-start gap-3" style={{ background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: "1px solid #F0E8EE" }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#F7E8EE" }}>
+            <Headphones className="w-5 h-5" style={{ color: "#C96B8A" }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E", fontSize: "0.88rem" }}>Kontak pendamping</p>
+            <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", fontSize: "0.78rem", marginTop: "0.15rem" }}>{PROGRAM_CONTACT.name}</p>
+            <a href={`tel:${PROGRAM_CONTACT.phoneTel}`} className="inline-block mt-1" style={{ fontFamily: "Nunito, sans-serif", fontWeight: 600, color: "#C96B8A", fontSize: "0.82rem" }}>
+              {PROGRAM_CONTACT.phoneDisplay}
+            </a>
+          </div>
+        </motion.div>
 
         <div className="h-4" />
       </div>

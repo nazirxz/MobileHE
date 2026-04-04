@@ -202,9 +202,20 @@ export default function PatientSession() {
   const [step, setStep] = useState(0); // 0=intro, 1=edukasi, 2=musik, 3=afirmasi, 4=refleksi, 5=done
   const [afirmasiNote, setAfirmasiNote] = useState("");
   const [afirmasiAudioUrl, setAfirmasiAudioUrl] = useState<string | undefined>(undefined);
+  const [affirmationPhraseIndex, setAffirmationPhraseIndex] = useState(0);
   const [mood, setMood] = useState<number | null>(null);
   const [refleksiAnswers, setRefleksiAnswers] = useState<Record<string, string>>({});
   const [startTime] = useState(Date.now());
+
+  const positivePhrases = sessionDef?.afirmasi.positivePhrases;
+  const affirmationDisplayText =
+    positivePhrases?.length && positivePhrases[affirmationPhraseIndex] !== undefined
+      ? positivePhrases[affirmationPhraseIndex]
+      : (sessionDef?.afirmasi.mainText ?? "");
+
+  useEffect(() => {
+    setAffirmationPhraseIndex(0);
+  }, [dayNum]);
 
   if (!sessionDef) return <div className="p-8 text-center" style={{ fontFamily: "Nunito, sans-serif" }}>Sesi tidak ditemukan.</div>;
 
@@ -237,6 +248,11 @@ export default function PatientSession() {
         </div>
         <div className="w-full rounded-2xl p-4" style={{ background: "#FEF9F7", border: "1px solid #F0E8EE" }}>
           <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", lineHeight: 1.7, fontSize: "0.9rem" }}>Selamat datang di sesi hari ini! Kamu akan melalui <strong style={{ color: "#C96B8A" }}>4 modul singkat</strong> yang dirancang untuk mendampingimu dengan penuh kasih. Lakukan dengan kecepatan dan kenyamananmu sendiri. Tidak ada yang terburu-buru. 💗</p>
+          {dayNum === 1 ? (
+            <p className="mt-3 pt-3" style={{ fontFamily: "Nunito, sans-serif", color: "#8B5A6B", lineHeight: 1.65, fontSize: "0.82rem", borderTop: "1px solid #F0E8EE" }}>
+              Pada hari pertama, selesaikan seluruh modul ini sampai tuntas; setelah perawat menyetujui sesimu, barulah kamu bisa melanjutkan ke hari berikutnya.
+            </p>
+          ) : null}
         </div>
         <div className="grid grid-cols-4 gap-2 w-full">
           {MODULES.map(({ icon: Icon, label, color, bg }) => (
@@ -333,9 +349,40 @@ export default function PatientSession() {
         </div>
         <div className="rounded-2xl p-4" style={{ background: "#E8F5EE" }}>
           <p style={{ fontFamily: "Nunito, sans-serif", color: "#4A8F6A", fontSize: "0.85rem", lineHeight: 1.7 }}>{sessionDef.afirmasi.instructions}</p>
+          {positivePhrases?.length && sessionDef.afirmasi.supportText ? (
+            <p className="mt-3" style={{ fontFamily: "Nunito, sans-serif", color: "#5A7A62", fontSize: "0.8rem", lineHeight: 1.65 }}>
+              {sessionDef.afirmasi.supportText}
+            </p>
+          ) : null}
         </div>
+        {positivePhrases?.length ? (
+          <div className="flex flex-col gap-2">
+            <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 600, color: "#4A4A6A", fontSize: "0.85rem" }}>Pilih kalimat positive self-talk:</p>
+            <div className="max-h-48 overflow-y-auto rounded-2xl p-2 flex flex-col gap-1.5" style={{ background: "white", border: "1px solid #D8E8D0" }}>
+              {positivePhrases.map((phrase, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setAffirmationPhraseIndex(idx)}
+                  className="text-left w-full px-3 py-2.5 rounded-xl transition-colors"
+                  style={{
+                    fontFamily: "Nunito, sans-serif",
+                    fontSize: "0.82rem",
+                    lineHeight: 1.45,
+                    color: "#2D2D3E",
+                    background: affirmationPhraseIndex === idx ? "#E8F5EE" : "#FEF9F7",
+                    border: affirmationPhraseIndex === idx ? "2px solid #6BAF8F" : "2px solid transparent",
+                  }}
+                >
+                  <span style={{ color: "#6BAF8F", fontWeight: 700, marginRight: "0.35rem" }}>{idx + 1}.</span>
+                  {phrase}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <RecordingSimulator
-          text={sessionDef.afirmasi.mainText}
+          text={affirmationDisplayText}
           onSave={({ note, audioUrl }) => {
             setAfirmasiNote(note);
             setAfirmasiAudioUrl(audioUrl);

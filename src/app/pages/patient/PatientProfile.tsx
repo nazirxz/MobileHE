@@ -1,8 +1,9 @@
 import { motion } from "motion/react";
-import { User, Phone, Activity, Calendar, LogOut, Heart, Shield, Info } from "lucide-react";
+import { User, Phone, Activity, Calendar, LogOut, Heart, Shield, Info, Headphones } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useNavigate } from "react-router";
 import type { Patient } from "../../data/mockData";
+import { PROGRAM_CONTACT } from "../../data/programContact";
 
 export default function PatientProfile() {
   const { currentUser, logout, getPatientSessions } = useApp();
@@ -64,6 +65,23 @@ export default function PatientProfile() {
               </div>
             </div>
           ))}
+        </motion.div>
+
+        {/* Program contact */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }} className="rounded-2xl p-4" style={{ background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: "1px solid #F0E8EE" }}>
+          <div className="flex items-center gap-2 mb-2">
+            <Headphones className="w-4 h-4" style={{ color: "#C96B8A" }} />
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#2D2D3E", fontSize: "0.9rem" }}>Kontak Pendamping Program</span>
+          </div>
+          <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6B80", fontSize: "0.82rem", lineHeight: 1.6, marginBottom: "0.75rem" }}>
+            Hubungi jika ada pertanyaan tentang program atau butuh bantuan.
+          </p>
+          <div className="flex flex-col gap-1">
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 600, color: "#2D2D3E", fontSize: "0.88rem" }}>{PROGRAM_CONTACT.name}</span>
+            <a href={`tel:${PROGRAM_CONTACT.phoneTel}`} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 600, color: "#C96B8A", fontSize: "0.88rem" }}>
+              {PROGRAM_CONTACT.phoneDisplay}
+            </a>
+          </div>
         </motion.div>
 
         {/* About program */}
